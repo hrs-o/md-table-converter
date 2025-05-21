@@ -4,3 +4,23 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+eframe = "0.31.1"
+
+[build-dependencies]
+reqwest = { version = "0.12.15", features = ["blocking", "rustls-tls"] }
+
+[profile.dev]
+opt-level = 1            # コンパイル速度を優先しつつある程度の最適化
+debug = true             # デバッガ用シンボルを残す
+overflow-checks = true   # 整数オーバーフロー検査は有効（開発中は安全性重視）
+incremental = true       # 増分コンパイルを有効化（ビルド高速化）
+
+[profile.release]
+opt-level = 3           # 最大限の最適化
+debug = false           # デバッグシンボル削除
+lto = true              # Link Time Optimization（サイズ＆速度向上）
+codegen-units = 1       # コード生成ユニットを 1 にすると最適化効果大
+panic = "abort"         # パニック時のオーバーヘッドを削減
+overflow-checks = false # オーバーフロー検査オフ
+incremental = false     # 増分コンパイルは不要
+strip = true            # ビルド後にシンボルを削除
