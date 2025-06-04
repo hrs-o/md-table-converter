@@ -22,8 +22,11 @@ fn is_data_line(line: &str) -> bool {
     if !line.starts_with('|') {
         return false;
     }
-    // 区切り行は全て '|', '-', ' ' のみで構成される
-    let is_separator = line.chars().all(|c| matches!(c, '|' | '-' | ' '));
+    // 区切り行は全て '|', '-', ':', ' ' のみで構成される
+    // Markdown の表では ':' を用いてアラインメントを指定できるため
+    let is_separator = line
+        .chars()
+        .all(|c| matches!(c, '|' | '-' | ':' | ' '));
     !is_separator
 }
 
@@ -33,4 +36,18 @@ fn parse_md_row(line: &str) -> Vec<String> {
         .split('|')
         .map(|cell| cell.trim().to_string())
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn separator_with_alignment_is_skipped() {
+        let md = "| h1 | h2 |\n|:---|---:|\n| a | b |";
+        let rows = parse_markdown_table(md);
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0], vec!["h1".to_string(), "h2".to_string()]);
+        assert_eq!(rows[1], vec!["a".to_string(), "b".to_string()]);
+    }
 }
